@@ -1,0 +1,83 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --c-canvas: 224 234 248;
+    --c-surface: 255 255 255;
+    --c-raised: 246 249 254;
+    --c-fg: 22 33 91;
+    --c-muted: 74 80 128;
+    --c-line: 201 213 238;
+    --c-link: 31 41 156;
+    color-scheme: light;
+  }
+
+  .dark {
+    --c-canvas: 22 33 91;
+    --c-surface: 16 26 72;
+    --c-raised: 27 39 102;
+    --c-fg: 224 234 248;
+    --c-muted: 169 180 218;
+    --c-line: 46 58 122;
+    --c-link: 48 209 255;
+    color-scheme: dark;
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-canvas font-body text-fg antialiased;
+    line-height: 1.5;
+    background-image: radial-gradient(ellipse at 8% 4%, rgb(163 169 245 / 0.16), transparent 23rem), radial-gradient(ellipse at 92% 18%, rgb(48 209 255 / 0.08), transparent 24rem);
+    background-attachment: fixed;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-heading;
+    line-height: 1.2;
+  }
+
+  :focus-visible {
+    outline: 2px solid #0373ff;
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+
+  ::selection {
+    background: #30d1ff;
+    color: #16215b;
+  }
+}
+
+@layer components {
+  .skip-link {
+    @apply sr-only;
+  }
+
+  .skip-link:focus {
+    @apply not-sr-only fixed left-4 top-4 z-[100] rounded-xl bg-cyan px-4 py-2 font-semibold text-ink-900 shadow-lift;
+  }
+
+  .skeleton {
+    @apply rounded-lg bg-line/60 bg-gradient-to-r from-transparent via-white/40 to-transparent bg-[length:400px_100%] animate-shimmer;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
