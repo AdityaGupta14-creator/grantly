@@ -7,6 +7,7 @@ export interface CalendarCell {
   inMonth: boolean;
 }
 
+/** Build a six-week calendar grid for a zero-based month. */
 export const buildMonthGrid = (year: number, month: number): CalendarCell[][] => {
   const firstDay = new Date(year, month, 1);
   const offset = (firstDay.getDay() + 6) % 7;
@@ -25,6 +26,7 @@ export const buildMonthGrid = (year: number, month: number): CalendarCell[][] =>
   return weeks;
 };
 
+/** Group scholarships by their ISO calendar deadline. */
 export const groupByDeadline = (scholarships: Scholarship[]): Map<string, Scholarship[]> => {
   const grouped = new Map<string, Scholarship[]>();
   for (const scholarship of scholarships) {
@@ -35,6 +37,7 @@ export const groupByDeadline = (scholarships: Scholarship[]): Map<string, Schola
   return grouped;
 };
 
+/** Check whether an ISO deadline belongs to a given zero-based month. */
 export const isSameMonth = (iso: string, year: number, month: number): boolean => {
   const date = parseISODate(iso);
   return date.getFullYear() === year && date.getMonth() === month;

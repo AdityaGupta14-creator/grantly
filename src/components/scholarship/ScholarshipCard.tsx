@@ -39,7 +39,7 @@ export const ScholarshipCard = ({ entry, viewMode = 'grid' }: ScholarshipCardPro
             {PROVIDER_LABELS[scholarship.providerType]}
           </p>
           <h3 id={titleId} className={cn('mt-1 font-heading text-lg font-semibold leading-snug text-fg', viewMode === 'list' && 'line-clamp-2')}>
-            <Link to={scholarshipPath(scholarship.id)} className="rounded-md after:absolute after:inset-0 hover:text-link">
+            <Link to={scholarshipPath(scholarship.id)} className="relative rounded-md after:absolute after:inset-0 hover:text-link">
               {scholarship.name}
             </Link>
           </h3>

@@ -1,4 +1,3 @@
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { X } from 'lucide-react';
 import { useEffect, useId, useRef, type ReactNode } from 'react';
 
@@ -17,7 +16,6 @@ export const Modal = ({ open, onClose, title, description, children, footer }: M
   const panelRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef(onClose);
   closeRef.current = onClose;
-  const reduceMotion = useReducedMotion();
 
   useEffect(() => {
     if (!open) return;
@@ -44,30 +42,18 @@ export const Modal = ({ open, onClose, title, description, children, footer }: M
   }, [open]);
 
   return (
-    <AnimatePresence>
+    <>
       {open && (
-        <motion.div
-          className="fixed inset-0 z-50 flex items-end justify-center bg-ink/60 sm:items-center sm:p-6"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: reduceMotion ? 0 : 0.2 }}
-          onMouseDown={(event) => {
-            if (event.target === event.currentTarget) onClose();
-          }}
-        >
-          <motion.div
+        <div className="motion-safe:animate-toast-in fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-6">
+          <button type="button" aria-label="Close dialog backdrop" onClick={onClose} className="absolute inset-0 cursor-default bg-ink/60" />
+          <div
             ref={panelRef}
             role="dialog"
             aria-modal="true"
             aria-labelledby={titleId}
             aria-describedby={description ? descriptionId : undefined}
             tabIndex={-1}
-            className="flex max-h-[90vh] w-full flex-col rounded-t-2xl bg-surface p-6 shadow-lift outline-none sm:max-w-lg sm:rounded-2xl"
-            initial={reduceMotion ? false : { opacity: 0, y: 32 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={reduceMotion ? undefined : { opacity: 0, y: 16 }}
-            transition={{ duration: reduceMotion ? 0 : 0.25, ease: 'easeOut' }}
+            className="motion-safe:animate-fade-up relative z-10 flex max-h-[90vh] w-full flex-col rounded-t-2xl bg-surface p-6 shadow-lift outline-none sm:max-w-lg sm:rounded-2xl"
           >
             <div className="flex items-start justify-between gap-4">
               <div>
@@ -91,9 +77,9 @@ export const Modal = ({ open, onClose, title, description, children, footer }: M
             </div>
             <div className="mt-5 min-h-0 flex-1 overflow-y-auto">{children}</div>
             {footer && <div className="mt-6 flex flex-wrap justify-end gap-3">{footer}</div>}
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       )}
-    </AnimatePresence>
+    </>
   );
 };

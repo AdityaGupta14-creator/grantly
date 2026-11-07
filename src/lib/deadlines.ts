@@ -15,6 +15,7 @@ export interface RelevantDeadline {
 export const DEADLINE_WINDOW_DAYS = 7;
 
 /** One source of truth for deadlines relevant to a student: eligible, saved, or tracked scholarships. */
+/** Select deadlines relevant to the current profile, saved items, and tracker. */
 export const selectRelevantDeadlines = (
   entries: ScholarshipEntry[],
   applications: TrackedApplication[],
@@ -32,5 +33,6 @@ export const selectRelevantDeadlines = (
     .sort((a, b) => a.scholarship.deadline.localeCompare(b.scholarship.deadline));
 };
 
+/** Narrow a selected deadline list to an inclusive time window. */
 export const deadlinesWithinDays = (deadlines: RelevantDeadline[], maxDays: number): RelevantDeadline[] =>
   deadlines.filter((deadline) => deadline.daysUntil >= 0 && deadline.daysUntil <= maxDays);

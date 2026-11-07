@@ -21,6 +21,7 @@ export const MAX_PERCENTAGE = 100;
 const selectValue = <T extends string>(value: unknown, options: readonly T[]): T | '' =>
   typeof value === 'string' && (options as readonly string[]).includes(value) ? value as T : '';
 
+/** Convert a stored profile into an editable onboarding form model. */
 export const profileToForm = (profile: UserProfile | null): ProfileForm => {
   if (!profile) {
     return {
@@ -50,6 +51,7 @@ export const profileToForm = (profile: UserProfile | null): ProfileForm => {
   };
 };
 
+/** Return inline validation messages for required match-driving fields. */
 export const validateProfileForm = (form: ProfileForm): ProfileFormErrors => {
   const errors: ProfileFormErrors = {};
   if (form.name.trim().length < 2) errors.name = 'Enter your name (at least 2 characters).';
@@ -67,6 +69,7 @@ export const validateProfileForm = (form: ProfileForm): ProfileFormErrors => {
   return errors;
 };
 
+/** Convert a validated form model into the profile store's draft shape. */
 export const formToDraft = (form: ProfileForm): ProfileDraft => ({
   ...form,
   name: form.name.trim(),

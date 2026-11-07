@@ -1,4 +1,3 @@
-import { animate, useReducedMotion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 
 interface AnimatedNumberProps {
@@ -9,21 +8,25 @@ interface AnimatedNumberProps {
 const defaultFormat = (value: number): string => value.toLocaleString('en-IN');
 
 export const AnimatedNumber = ({ value, format = defaultFormat }: AnimatedNumberProps) => {
-  const reduceMotion = useReducedMotion();
-  const [display, setDisplay] = useState(reduceMotion ? value : 0);
+  const [display, setDisplay] = useState(value);
 
   useEffect(() => {
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (reduceMotion) {
       setDisplay(value);
       return;
     }
-    const controls = animate(0, value, {
-      duration: 1.2,
-      ease: 'easeOut',
-      onUpdate: (latest) => setDisplay(Math.round(latest)),
-    });
-    return () => controls.stop();
-  }, [value, reduceMotion]);
+    const startedAt = performance.now();
+    let frame = 0;
+    const tick = (now: number) => {
+      const progress = Math.min(1, (now - startedAt) / 1200);
+      const eased = 1 - (1 - progress) ** 3;
+      setDisplay(Math.round(value * eased));
+      if (progress < 1) frame = requestAnimationFrame(tick);
+    };
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [value]);
 
   return <span>{format(display)}</span>;
 };

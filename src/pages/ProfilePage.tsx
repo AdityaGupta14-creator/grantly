@@ -13,6 +13,16 @@ import { useProfileStore } from '@/store/profileStore';
 
 const EXPORT_FILENAME = 'grantly-workspace.json';
 
+const readFileText = (file: File): Promise<string> => {
+  if (typeof file.text === 'function') return file.text();
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => typeof reader.result === 'string' ? resolve(reader.result) : reject(new Error('The file could not be read.'));
+    reader.onerror = () => reject(new Error('The file could not be read.'));
+    reader.readAsText(file);
+  });
+};
+
 export const ProfilePage = () => {
   useDocumentTitle('Your profile');
   const profile = useProfileStore((state) => state.profile);
@@ -45,7 +55,10 @@ export const ProfilePage = () => {
 
   const handleImport = async (file: File) => {
     try {
-      importWorkspace(await file.text());
+      if (!file.name.toLowerCase().endsWith('.json') || file.size > 1_048_576) {
+        throw new Error(file.size > 1_048_576 ? 'Choose a JSON file smaller than 1 MB.' : 'Choose a .json Grantly backup file.');
+      }
+      importWorkspace(await readFileText(file));
       setForm(profileToForm(useProfileStore.getState().profile));
       toast.success('Data imported', 'Your profile and tracker were restored.');
     } catch (error) {
@@ -122,7 +135,7 @@ export const ProfilePage = () => {
           </Card>
 
           <Card className="space-y-4 border-danger/40 p-6">
-            <h2 className="font-heading text-lg font-semibold text-danger-700">Reset everything</h2>
+            <h2 className="font-heading text-lg font-semibold text-danger-700 dark:text-danger-300">Reset everything</h2>
             <p className="text-sm text-muted">Clears your profile, tracker, notes and compare list from this browser.</p>
             <Button variant="danger" className="w-full" onClick={() => setResetOpen(true)}>
               <RotateCcw size={18} aria-hidden="true" />

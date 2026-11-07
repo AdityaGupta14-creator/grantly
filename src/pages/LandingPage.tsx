@@ -1,4 +1,3 @@
-import { motion, useReducedMotion } from 'framer-motion';
 import { BadgeCheck, Compass, Kanban, Scale, Sparkles, Target, Wallet, Bell, ArrowRight, GraduationCap } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/Button';
@@ -31,16 +30,9 @@ const FEATURES = [
 
 const totalFunding = scholarships.reduce((sum, item) => sum + item.amount, 0);
 
-const fadeUp = (delay: number, reduce: boolean | null) => ({
-  initial: reduce ? false : { opacity: 0, y: 16 },
-  animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.5, delay, ease: 'easeOut' as const },
-});
-
 export const LandingPage = () => {
   useDocumentTitle('Find it. Match it. Win it.');
   const navigate = useNavigate();
-  const reduceMotion = useReducedMotion();
   const profile = useProfileStore((state) => state.profile);
   const [confirmDemoOpen, setConfirmDemoOpen] = useState(false);
 
@@ -69,7 +61,7 @@ export const LandingPage = () => {
           <span className="absolute left-1 top-9 h-1.5 w-5 rotate-[-35deg] rounded-full bg-cyan-600" />
           <span className="absolute right-0 top-9 h-1.5 w-5 rotate-[-35deg] rounded-full bg-cyan-600" />
         </div>
-        <motion.div {...fadeUp(0, reduceMotion)} className="relative max-w-3xl space-y-6">
+        <div className="motion-safe:animate-fade-up relative max-w-3xl space-y-6">
           <p className="inline-flex items-center gap-2 rounded-full bg-white/80 px-4 py-2 text-sm font-semibold text-ink shadow-sm ring-1 ring-white/80">
             <GraduationCap size={16} aria-hidden="true" />
             Scholarships for Indian students
@@ -95,7 +87,7 @@ export const LandingPage = () => {
             </button>
           </div>
           <p className="text-sm text-muted">Sample data for demonstration. Nothing leaves your browser.</p>
-        </motion.div>
+        </div>
       </section>
 
       <section aria-labelledby="stats-title" className="space-y-8">
@@ -107,7 +99,7 @@ export const LandingPage = () => {
             { value: 4, label: 'steps from search to win' },
           ].map((stat) => (
             <Card key={stat.label} className="p-6 text-center">
-              <p className="font-heading text-4xl font-bold text-primary">
+              <p className="font-heading text-4xl font-bold text-primary dark:text-cyan">
                 <AnimatedNumber value={stat.value} format={stat.format} />
               </p>
               <p className="mt-2 text-sm font-medium text-muted">{stat.label}</p>
@@ -125,12 +117,10 @@ export const LandingPage = () => {
         </div>
         <ol className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {JOURNEY.map((step, index) => (
-            <motion.li
+            <li
               key={step.title}
-              initial={reduceMotion ? false : { opacity: 0, y: 16 }}
-              whileInView={reduceMotion ? undefined : { opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.4 }}
-              transition={{ duration: reduceMotion ? 0 : 0.4, delay: reduceMotion ? 0 : index * 0.08 }}
+              className="motion-safe:animate-fade-up"
+              style={{ animationDelay: `${index * 80}ms` }}
             >
               <Card interactive className="h-full p-6">
                 <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-pale text-primary">
@@ -140,7 +130,7 @@ export const LandingPage = () => {
                 <h3 className="mt-1 font-heading text-xl font-semibold text-fg">{step.title}</h3>
                 <p className="mt-2 text-sm text-muted">{step.text}</p>
               </Card>
-            </motion.li>
+            </li>
           ))}
         </ol>
       </section>

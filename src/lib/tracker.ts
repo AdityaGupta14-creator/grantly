@@ -7,6 +7,7 @@ import type { ScholarshipEntry } from '@/lib/discover';
 export const BOARD_COLUMNS = ['saved', 'preparing', 'submitted', 'result'] as const;
 export type BoardColumnId = (typeof BOARD_COLUMNS)[number];
 
+/** Map the stored application status into its kanban board column. */
 export const columnForStatus = (status: ApplicationStatus): BoardColumnId => {
   if (status === 'won' || status === 'rejected') return 'result';
   return status;
@@ -17,6 +18,7 @@ export interface ChecklistProgress {
   total: number;
 }
 
+/** Calculate checklist completion for one tracked scholarship. */
 export const checklistProgress = (application: TrackedApplication, scholarship: Scholarship): ChecklistProgress => ({
   done: scholarship.documents.filter((doc) => application.checklist[doc] === true).length,
   total: scholarship.documents.length,
@@ -34,6 +36,7 @@ export interface VaultEntry {
   readyCount: number;
 }
 
+/** Merge required documents across active applications into a shared vault. */
 export const buildDocumentVault = (
   applications: TrackedApplication[],
   scholarshipsById: Map<string, Scholarship>,
@@ -68,6 +71,7 @@ export interface TrackedRow {
   scholarship: Scholarship;
 }
 
+/** Join saved application records with catalog details for tracker views. */
 export const buildTrackedRows = (
   applications: Record<string, TrackedApplication>,
   scholarshipsById: Map<string, Scholarship>,
@@ -89,6 +93,7 @@ export interface AppNotification {
 
 export const DEADLINE_ALERT_DAYS = DEADLINE_WINDOW_DAYS;
 
+/** Create notification items from selected deadlines and unseen identifiers. */
 export const buildNotifications = (
   applications: TrackedApplication[],
   entries: ScholarshipEntry[],

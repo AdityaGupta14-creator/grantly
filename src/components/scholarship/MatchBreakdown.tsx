@@ -3,10 +3,10 @@ import type { CriterionStatus, MatchCriterion } from '@/lib/match';
 import { cn } from '@/lib/cn';
 
 const STATUS_META: Record<CriterionStatus, { icon: typeof Check; label: string; className: string }> = {
-  met: { icon: Check, label: 'Met', className: 'text-success-700' },
-  near: { icon: AlertTriangle, label: 'Nearly met', className: 'text-warning-700' },
-  not_met: { icon: X, label: 'Not met', className: 'text-danger-700' },
-  unknown: { icon: AlertTriangle, label: 'Add info', className: 'text-action-700' },
+  met: { icon: Check, label: 'Met', className: 'text-success-700 dark:text-success-300' },
+  near: { icon: AlertTriangle, label: 'Nearly met', className: 'text-warning-700 dark:text-warning-300' },
+  not_met: { icon: X, label: 'Not met', className: 'text-danger-700 dark:text-danger-300' },
+  unknown: { icon: AlertTriangle, label: 'Add info', className: 'text-action-700 dark:text-action-300' },
 };
 
 interface MatchBreakdownProps {

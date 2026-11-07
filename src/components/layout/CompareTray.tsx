@@ -1,4 +1,3 @@
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { Scale, X } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { Button } from '@/components/ui/Button';
@@ -12,19 +11,14 @@ export const CompareTray = () => {
   const removeCompare = useCompareStore((state) => state.removeCompare);
   const clearCompare = useCompareStore((state) => state.clearCompare);
   const { pathname } = useLocation();
-  const reduceMotion = useReducedMotion();
   const visible = selectedIds.length > 0 && pathname !== ROUTES.compare;
 
   return (
-    <AnimatePresence>
+    <>
       {visible && (
-        <motion.section
+        <section
           aria-label="Compare tray"
-          initial={reduceMotion ? false : { y: 120, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={reduceMotion ? undefined : { y: 120, opacity: 0 }}
-          transition={reduceMotion ? { duration: 0 } : { type: 'spring', stiffness: 260, damping: 28 }}
-          className="fixed inset-x-0 bottom-20 z-40 px-4 lg:bottom-0 lg:left-64 lg:px-6 lg:pb-4"
+          className="motion-safe:animate-slide-up fixed inset-x-0 bottom-20 z-40 px-4 lg:bottom-0 lg:left-64 lg:px-6 lg:pb-4"
         >
           <div className="mx-auto flex max-w-4xl flex-col gap-3 rounded-2xl border border-line bg-surface p-4 shadow-tray sm:flex-row sm:items-center">
             <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
@@ -60,8 +54,8 @@ export const CompareTray = () => {
               </Link>
             </div>
           </div>
-        </motion.section>
+        </section>
       )}
-    </AnimatePresence>
+    </>
   );
 };

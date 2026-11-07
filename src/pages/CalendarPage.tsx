@@ -88,16 +88,17 @@ export const CalendarPage = () => {
                           type="button"
                           onClick={() => setSelected(cell.iso)}
                           aria-pressed={isSelected}
-                          aria-label={`${formatDate(cell.iso)}${count > 0 ? `, ${count} deadline${count === 1 ? '' : 's'}, ${getUrgency(cell.iso) === 'urgent' ? 'within 7 days' : getUrgency(cell.iso) === 'overdue' ? 'closed' : 'upcoming'}` : ''}`}
                           className={cn(
                             'relative flex aspect-square min-h-11 w-full flex-col items-center justify-center rounded-xl text-sm transition hover:ring-2 hover:ring-action/50',
-                            count > 0 ? dayTone(cell.iso) : 'text-fg hover:bg-raised',
-                            !cell.inMonth && 'opacity-40',
+                            count > 0 ? dayTone(cell.iso) : (!cell.inMonth ? 'text-muted hover:bg-raised' : 'text-fg hover:bg-raised'),
                             isSelected && 'ring-2 ring-primary',
                           )}
                         >
-                          {cell.date.getDate()}
-                          {count > 0 && <span className="mt-0.5 text-[10px] font-bold">{count}</span>}
+                          <span className="sr-only">
+                            {formatDate(cell.iso)}{count > 0 ? `, ${count} deadline${count === 1 ? '' : 's'}, ${getUrgency(cell.iso) === 'urgent' ? 'within 7 days' : getUrgency(cell.iso) === 'overdue' ? 'closed' : 'upcoming'}` : ''}
+                          </span>
+                          <span aria-hidden="true">{cell.date.getDate()}</span>
+                          {count > 0 && <span aria-hidden="true" className="mt-0.5 text-[10px] font-bold">{count}</span>}
                         </button>
                       </td>
                     );

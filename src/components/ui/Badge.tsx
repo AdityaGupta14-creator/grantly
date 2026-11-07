@@ -5,7 +5,7 @@ export type BadgeTone = 'neutral' | 'urgent' | 'success' | 'info' | 'warning' | 
 
 const TONE_CLASS: Record<BadgeTone, string> = {
   neutral: 'border border-line bg-raised text-fg',
-  urgent: 'bg-urgent text-ink',
+  urgent: 'bg-urgent text-ink-900',
   success: 'border border-success-200 bg-success-50 text-success-800',
   info: 'border border-action-200 bg-action-50 text-action-800',
   warning: 'border border-warning-200 bg-warning-50 text-warning-800',

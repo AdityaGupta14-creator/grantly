@@ -199,6 +199,7 @@ const flagsCriterion = (scholarship: Scholarship, profile: UserProfile): MatchCr
   return { ...base, status: 'not_met', explanation: `Requires: ${required}` };
 };
 
+/** Evaluate every criterion and calculate a transparent eligibility tier and score. */
 export const evaluateScholarship = (scholarship: Scholarship, profile: UserProfile): MatchResult => {
   const criteria: MatchCriterion[] = [
     levelCriterion(scholarship, profile),
@@ -229,11 +230,13 @@ export const evaluateScholarship = (scholarship: Scholarship, profile: UserProfi
 
 const SEVERITY: Record<CriterionStatus, number> = { not_met: 0, unknown: 1, near: 2, met: 3 };
 
+/** Select the most useful criteria to summarize on compact scholarship cards. */
 export const pickHighlights = (criteria: MatchCriterion[], limit: number): MatchCriterion[] =>
   [...criteria]
     .sort((a, b) => SEVERITY[a.status] - SEVERITY[b.status] || b.weight - a.weight)
     .slice(0, limit);
 
+/** Map a match score to the shared visual strength token. */
 export const scoreTone = (score: number): 'strong' | 'good' | 'partial' => {
   if (score >= 75) return 'strong';
   if (score >= 50) return 'good';

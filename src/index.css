@@ -2,6 +2,33 @@
 @tailwind components;
 @tailwind utilities;
 
+@keyframes page-in {
+  from { transform: translateY(0.75rem); }
+  to { transform: translateY(0); }
+}
+
+@keyframes fade-up {
+  from { transform: translateY(1rem); }
+  to { transform: translateY(0); }
+}
+
+@keyframes slide-up {
+  from { transform: translateY(2rem); }
+  to { transform: translateY(0); }
+}
+
+@keyframes toast-in {
+  from { transform: translateY(1rem) scale(0.98); }
+  to { transform: translateY(0) scale(1); }
+}
+
+@layer utilities {
+  .animate-page-in { animation: page-in 250ms ease-out both; }
+  .animate-fade-up { animation: fade-up 400ms ease-out both; }
+  .animate-slide-up { animation: slide-up 220ms ease-out both; }
+  .animate-toast-in { animation: toast-in 200ms ease-out both; }
+}
+
 @layer base {
   :root {
     --c-canvas: 224 234 248;

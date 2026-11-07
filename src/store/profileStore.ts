@@ -1,6 +1,8 @@
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { create } from 'zustand';
 import type { UserProfile } from '@/types/profile';
+import { profilePersistSchema } from '@/lib/schemas';
+import { safeLocalStorage } from '@/lib/persistStorage';
 
 export const PROFILE_STORAGE_KEY = 'grantly-profile';
 
@@ -19,6 +21,13 @@ export const useProfileStore = create<ProfileState>()(
       saveProfile: (draft) => set({ profile: { ...draft, isDemo: false, updatedAt: new Date().toISOString() } }),
       setProfile: (profile) => set({ profile }),
     }),
-    { name: PROFILE_STORAGE_KEY, storage: createJSONStorage(() => localStorage) },
+    {
+      name: PROFILE_STORAGE_KEY,
+      storage: createJSONStorage(() => safeLocalStorage),
+      merge: (persisted, current) => {
+        const parsed = profilePersistSchema.safeParse(persisted);
+        return parsed.success ? { ...current, ...parsed.data } : current;
+      },
+    },
   ),
 );

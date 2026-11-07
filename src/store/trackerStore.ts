@@ -2,6 +2,8 @@ import { createJSONStorage, persist } from 'zustand/middleware';
 import { create } from 'zustand';
 import type { DocumentId } from '@/types/options';
 import type { ApplicationStatus, TrackedApplication } from '@/types/tracker';
+import { trackerPersistSchema } from '@/lib/schemas';
+import { safeLocalStorage } from '@/lib/persistStorage';
 
 export const TRACKER_STORAGE_KEY = 'grantly-tracker';
 
@@ -73,6 +75,13 @@ export const useTrackerStore = create<TrackerState>()(
         })),
       replaceTracker: (data) => set({ applications: data.applications, reminderIds: data.reminderIds }),
     }),
-    { name: TRACKER_STORAGE_KEY, storage: createJSONStorage(() => localStorage) },
+    {
+      name: TRACKER_STORAGE_KEY,
+      storage: createJSONStorage(() => safeLocalStorage),
+      merge: (persisted, current) => {
+        const parsed = trackerPersistSchema.safeParse(persisted);
+        return parsed.success ? { ...current, ...parsed.data } : current;
+      },
+    },
   ),
 );

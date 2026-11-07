@@ -48,6 +48,7 @@ export const DEFAULT_FILTERS: DiscoverFilters = {
   eligibleOnly: false,
 };
 
+/** Apply user-selected search and eligibility filters without excluding unknown defaults. */
 export const applyDiscoverFilters = (entries: ScholarshipEntry[], filters: DiscoverFilters): ScholarshipEntry[] => {
   const query = filters.query.trim().toLowerCase();
   const minAmount = AMOUNT_STEPS[filters.minAmountIndex] ?? 0;
@@ -76,6 +77,7 @@ export const applyDiscoverFilters = (entries: ScholarshipEntry[], filters: Disco
   });
 };
 
+/** Sort scholarship results by match tier, closing date, or funding amount. */
 export const sortEntries = (entries: ScholarshipEntry[], sort: SortKey): ScholarshipEntry[] => {
   const sorted = [...entries];
   if (sort === 'match') {
@@ -93,6 +95,7 @@ export const sortEntries = (entries: ScholarshipEntry[], sort: SortKey): Scholar
   return sorted.sort((a, b) => b.scholarship.amount - a.scholarship.amount);
 };
 
+/** Count currently active Discover filters for the filter button badge. */
 export const countActiveFilters = (filters: DiscoverFilters): number =>
   [
     filters.query.trim() !== '',

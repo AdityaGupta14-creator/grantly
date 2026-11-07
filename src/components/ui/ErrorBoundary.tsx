@@ -1,4 +1,4 @@
-import { Component, type ErrorInfo, type ReactNode } from 'react';
+import { Component, type ReactNode } from 'react';
 import { Button } from '@/components/ui/Button';
 
 interface Props { children: ReactNode }
@@ -9,9 +9,7 @@ export class ErrorBoundary extends Component<Props, State> {
 
   static getDerivedStateFromError(): State { return { failed: true }; }
 
-  componentDidCatch(error: Error, info: ErrorInfo) {
-    console.error('Grantly page failed to render', error, info.componentStack);
-  }
+  componentDidCatch() {}
 
   render() {
     if (this.state.failed) {

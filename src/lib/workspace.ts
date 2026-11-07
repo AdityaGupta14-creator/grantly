@@ -1,12 +1,12 @@
 import { DEMO_PROFILE } from '@/data/demoProfile';
-import { CATEGORIES, EDUCATION_LEVELS, FIELDS_OF_STUDY, GENDERS, INCOME_BANDS, SPECIAL_FLAGS, STATES, DOCUMENT_IDS } from '@/types/options';
 import type { DocumentId } from '@/types/options';
 import type { UserProfile } from '@/types/profile';
-import { APPLICATION_STATUSES, type ApplicationStatus, type TrackedApplication } from '@/types/tracker';
+import type { ApplicationStatus, TrackedApplication } from '@/types/tracker';
 import { useProfileStore } from '@/store/profileStore';
 import { useTrackerStore, type TrackerData } from '@/store/trackerStore';
 import { useCompareStore } from '@/store/compareStore';
 import { usePreferencesStore } from '@/store/preferencesStore';
+import { workspaceExportSchema } from '@/lib/schemas';
 
 const EXPORT_VERSION = 1;
 
@@ -68,6 +68,7 @@ const buildDemoTracker = (): TrackerData => {
   return { applications, reminderIds: ['pragati', 'maharashtra-obc', 'pm-yasasvi-obc'] };
 };
 
+/** Load the demo profile, partial document progress, and near-term reminders. */
 export const loadDemoWorkspace = (): void => {
   useProfileStore.getState().setProfile({ ...DEMO_PROFILE, updatedAt: new Date().toISOString() });
   useTrackerStore.getState().replaceTracker(buildDemoTracker());
@@ -75,6 +76,7 @@ export const loadDemoWorkspace = (): void => {
   usePreferencesStore.getState().clearSeenNotifications();
 };
 
+/** Clear profile, tracker, comparison, and notification state for this browser. */
 export const resetWorkspace = (): void => {
   useProfileStore.getState().setProfile(null);
   useTrackerStore.getState().replaceTracker({ applications: {}, reminderIds: [] });
@@ -82,6 +84,7 @@ export const resetWorkspace = (): void => {
   usePreferencesStore.getState().clearSeenNotifications();
 };
 
+/** Serialize the current local workspace into a versioned JSON backup. */
 export const exportWorkspace = (): string => {
   const payload: WorkspaceExport = {
     version: EXPORT_VERSION,
@@ -95,73 +98,21 @@ export const exportWorkspace = (): string => {
   return JSON.stringify(payload, null, 2);
 };
 
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === 'object' && value !== null && !Array.isArray(value);
-
-const isOneOf = <T extends string>(options: readonly T[], value: unknown): value is T =>
-  typeof value === 'string' && (options as readonly string[]).includes(value);
-
-const isProfile = (value: unknown): value is UserProfile => {
-  if (!isRecord(value)) return false;
-  return (
-    typeof value.name === 'string' &&
-    isOneOf(EDUCATION_LEVELS, value.level) &&
-    isOneOf(FIELDS_OF_STUDY, value.field) &&
-    isOneOf(STATES, value.state) &&
-    isOneOf(CATEGORIES, value.category) &&
-    (value.gender == null || isOneOf(GENDERS, value.gender)) &&
-    (value.incomeBand == null || isOneOf(INCOME_BANDS.map((band) => band.id), value.incomeBand)) &&
-    (value.percentage == null || (typeof value.percentage === 'number' && value.percentage >= 0 && value.percentage <= 100)) &&
-    (value.flags === undefined || (Array.isArray(value.flags) && value.flags.every((flag) => isOneOf(SPECIAL_FLAGS, flag)))) &&
-    (value.flagsKnown === undefined || typeof value.flagsKnown === 'boolean') &&
-    typeof value.isDemo === 'boolean' &&
-    typeof value.updatedAt === 'string'
-  );
-};
-
-const isTrackedApplication = (value: unknown): value is TrackedApplication => {
-  if (!isRecord(value)) return false;
-  if (!isRecord(value.checklist)) return false;
-  const checklistValid = Object.entries(value.checklist).every(
-    ([key, checked]) => isOneOf(DOCUMENT_IDS, key) && typeof checked === 'boolean',
-  );
-  return (
-    typeof value.scholarshipId === 'string' &&
-    isOneOf(APPLICATION_STATUSES, value.status) &&
-    checklistValid &&
-    typeof value.notes === 'string' &&
-    typeof value.createdAt === 'string' &&
-    typeof value.updatedAt === 'string'
-  );
-};
-
+/** Validate and sanitize a size-limited workspace backup before it is imported. */
 export const validateWorkspaceExport = (text: string): WorkspaceExport => {
-  const data: unknown = JSON.parse(text);
-  if (!isRecord(data) || data.version !== EXPORT_VERSION || !isRecord(data.tracker) || typeof data.exportedAt !== 'string' || Number.isNaN(Date.parse(data.exportedAt))) {
-    throw new Error('This file is not a Grantly export.');
+  if (new TextEncoder().encode(text).byteLength > 1_048_576) {
+    throw new Error('This backup is larger than 1 MB. Choose a smaller Grantly JSON file.');
   }
-  const { profile, tracker } = data;
-  if (profile !== null && !isProfile(profile)) throw new Error('The profile in this file is incomplete.');
-  if (!isRecord(tracker.applications) || !Array.isArray(tracker.reminderIds)) {
-    throw new Error('The tracker data in this file is incomplete.');
+  let data: unknown;
+  try { data = JSON.parse(text); } catch {
+    throw new Error('This file is not valid JSON. Choose a Grantly JSON backup.');
   }
-  const applications = Object.values(tracker.applications);
-  if (!applications.every(isTrackedApplication) || Object.entries(tracker.applications).some(([id, application]) => !isTrackedApplication(application) || application.scholarshipId !== id)) throw new Error('Some applications in this file are invalid.');
-  if (!tracker.reminderIds.every((id): id is string => typeof id === 'string')) {
-    throw new Error('Reminder data in this file is invalid.');
-  }
-
-  return {
-    version: EXPORT_VERSION,
-    exportedAt: data.exportedAt,
-    profile,
-    tracker: {
-      applications: tracker.applications as Record<string, TrackedApplication>,
-      reminderIds: tracker.reminderIds as string[],
-    },
-  };
+  const parsed = workspaceExportSchema.safeParse(data);
+  if (!parsed.success) throw new Error('This backup is incomplete or contains invalid profile or tracker data.');
+  return parsed.data as WorkspaceExport;
 };
 
+/** Replace local workspace stores only after the complete backup validates. */
 export const importWorkspace = (text: string): void => {
   const parsed = validateWorkspaceExport(text);
   useProfileStore.getState().setProfile(parsed.profile);

@@ -1,4 +1,3 @@
-import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowRight, CalendarClock, Compass, FileText, Sparkles, UserRound, Wallet } from 'lucide-react';
 import { useMemo } from 'react';
 import { Link } from 'react-router-dom';
@@ -29,7 +28,7 @@ const ACTIVE_STATUSES: ApplicationStatus[] = ['saved', 'preparing', 'submitted']
 const KpiCard = ({ icon: Icon, label, value, format }: { icon: typeof Wallet; label: string; value: number; format?: (n: number) => string }) => (
   <Card className="p-5">
     <div className="flex items-center justify-between gap-3">
-      <p className="text-sm font-semibold text-ink">{label}</p>
+      <p className="text-sm font-semibold text-fg">{label}</p>
       <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-pale text-primary">
         <Icon size={18} aria-hidden="true" />
       </span>
@@ -75,7 +74,6 @@ export const DashboardPage = () => {
   const profile = useProfileStore((state) => state.profile);
   const applications = useTrackerStore((state) => state.applications);
   const entries = useMatches();
-  const reduceMotion = useReducedMotion();
 
   const eligible = useMemo(
     () => entries.filter((entry) => entry.match.eligible).sort((a, b) => b.match.score - a.match.score),
@@ -142,9 +140,9 @@ export const DashboardPage = () => {
 
       <div className="mt-6 grid gap-6 lg:grid-cols-3">
         <Card className="flex flex-col gap-5 p-6 lg:col-span-2">
-          <p className="text-sm font-semibold uppercase tracking-wider text-primary">Next best action</p>
-          <h2 className="font-heading text-2xl font-bold text-ink">{action.title}</h2>
-          <p className="text-ink">{action.body}</p>
+          <p className="text-sm font-semibold uppercase tracking-wider text-primary dark:text-cyan">Next best action</p>
+          <h2 className="font-heading text-2xl font-bold text-fg">{action.title}</h2>
+          <p className="text-fg">{action.body}</p>
           <Link
             to={action.to}
             className={buttonClass('primary', 'md', 'w-fit')}
@@ -165,9 +163,9 @@ export const DashboardPage = () => {
           <div>
             <h2 className="font-heading text-lg font-semibold text-fg">Application readiness</h2>
             {progressTotals.total === 0 ? (
-              <p className="text-sm text-ink">Save a scholarship to start preparing documents and track your readiness here.</p>
+              <p className="text-sm text-muted">Save a scholarship to start preparing documents and track your readiness here.</p>
             ) : (
-              <p className="text-sm text-ink">
+              <p className="text-sm text-muted">
                 {progressTotals.done} of {progressTotals.total} documents ready across {active.length} applications.
               </p>
             )}
@@ -185,7 +183,7 @@ export const DashboardPage = () => {
           </Link>
         </div>
         {upcoming.length === 0 ? (
-          <Card className="p-6 text-sm text-ink">No relevant upcoming deadlines. Save or track a scholarship to see it here.</Card>
+          <Card className="p-6 text-sm text-muted">No relevant upcoming deadlines. Save or track a scholarship to see it here.</Card>
         ) : (
           <ul className="grid gap-3 md:grid-cols-2">
             {upcoming.slice(0, 4).map((deadline) => (
@@ -195,7 +193,7 @@ export const DashboardPage = () => {
                     <Link to={scholarshipPath(deadline.scholarship.id)} className="block truncate font-semibold text-fg hover:text-link">
                       {deadline.scholarship.name}
                     </Link>
-                    <p className="text-sm text-ink">{deadline.application ? STATUS_LABELS[deadline.application.status] : 'Eligible match'}</p>
+                    <p className="text-sm text-muted">{deadline.application ? STATUS_LABELS[deadline.application.status] : 'Eligible match'}</p>
                   </div>
                   <DeadlineBadge deadline={deadline.scholarship.deadline} />
                 </Card>
@@ -219,9 +217,9 @@ export const DashboardPage = () => {
           <Card className="space-y-3 p-6">
             {nearlyEligible.length > 0 ? (
               <>
-                <p className="text-sm font-semibold uppercase tracking-wide text-primary">You’re close on {nearlyEligible.length} scholarships</p>
+                <p className="text-sm font-semibold uppercase tracking-wide text-primary dark:text-cyan">You’re close on {nearlyEligible.length} scholarships</p>
                 <h3 className="font-heading text-xl font-semibold text-fg">{nearlyEligible[0].scholarship.name}</h3>
-                <p className="text-sm text-ink">
+                <p className="text-sm text-muted">
                   What to change: {nearlyEligible[0].match.criteria
                     .filter((criterion) => criterion.status === 'near' || criterion.status === 'unknown')
                     .sort((a, b) => (a.status === 'near' ? -1 : 1) - (b.status === 'near' ? -1 : 1) || b.weight - a.weight)[0]?.explanation ?? 'Review the eligibility details and complete any missing profile information.'}
@@ -234,7 +232,7 @@ export const DashboardPage = () => {
             ) : (
               <>
                 <p className="font-semibold text-fg">No eligible scholarships match your current answers yet.</p>
-                <p className="text-sm text-ink">Check that your education, marks, category and income are up to date. You can edit them at any time.</p>
+                <p className="text-sm text-muted">Check that your education, marks, category and income are up to date. You can edit them at any time.</p>
                 <Link to={ROUTES.profile} className="text-sm font-semibold text-link underline underline-offset-4">Review your profile</Link>
               </>
             )}
@@ -242,15 +240,13 @@ export const DashboardPage = () => {
         ) : (
           <ul className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto px-4 pb-4 sm:-mx-6 sm:px-6" aria-label="Top matches">
             {eligible.slice(0, 6).map((entry, index) => (
-              <motion.li
+              <li
                 key={entry.scholarship.id}
-                initial={reduceMotion ? false : { opacity: 0, x: 24 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: reduceMotion ? 0 : index * 0.06, duration: reduceMotion ? 0 : 0.35 }}
-                className="w-[18rem] shrink-0 snap-start sm:w-80"
+                className="motion-safe:animate-fade-up w-[18rem] shrink-0 snap-start sm:w-80"
+                style={{ animationDelay: `${index * 60}ms` }}
               >
                 <ScholarshipCard entry={entry} />
-              </motion.li>
+              </li>
             ))}
           </ul>
         )}
@@ -261,7 +257,7 @@ export const DashboardPage = () => {
           Recent activity
         </h2>
         {recent.length === 0 ? (
-          <Card className="p-6 text-sm text-ink">Your recent saves and status changes will appear here.</Card>
+          <Card className="p-6 text-sm text-muted">Your recent saves and status changes will appear here.</Card>
         ) : (
           <Card className="divide-y divide-line/70 p-2">
             <ul>
@@ -271,7 +267,7 @@ export const DashboardPage = () => {
                     <Link to={scholarshipPath(row.scholarship.id)} className="font-semibold text-fg hover:text-link">
                       {row.scholarship.name}
                     </Link>
-                    <p className="text-sm text-ink">Updated {formatShortDate(row.application.updatedAt.slice(0, 10))}</p>
+                    <p className="text-sm text-muted">Updated {formatShortDate(row.application.updatedAt.slice(0, 10))}</p>
                   </div>
                   <Badge tone={row.application.status === 'won' ? 'success' : row.application.status === 'rejected' ? 'danger' : 'info'}>
                     {STATUS_LABELS[row.application.status]}

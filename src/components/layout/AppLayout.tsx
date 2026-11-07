@@ -1,4 +1,3 @@
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { BottomNav } from '@/components/layout/BottomNav';
@@ -19,7 +18,6 @@ export const AppLayout = ({ showNav = true }: AppLayoutProps) => {
   const [collapsed, setCollapsed] = useState(false);
   const [demoBannerDismissed, setDemoBannerDismissed] = useState(false);
   const isDemo = useProfileStore((state) => state.profile?.isDemo ?? false);
-  const reduceMotion = useReducedMotion();
 
   return (
     <div className="min-h-screen">
@@ -38,17 +36,9 @@ export const AppLayout = ({ showNav = true }: AppLayoutProps) => {
           </div>
         )}
         <main id="main-content" tabIndex={-1} className="mx-auto w-full max-w-6xl px-4 pb-32 pt-6 outline-none sm:px-6 lg:pb-16 lg:pt-8">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={pathname}
-              initial={reduceMotion ? false : { opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={reduceMotion ? undefined : { opacity: 0 }}
-              transition={{ duration: reduceMotion ? 0 : 0.25, ease: 'easeOut' }}
-            >
-              <Outlet />
-            </motion.div>
-          </AnimatePresence>
+          <div key={pathname} className="motion-safe:animate-page-in">
+            <Outlet />
+          </div>
         </main>
       </div>
       {showNav && (

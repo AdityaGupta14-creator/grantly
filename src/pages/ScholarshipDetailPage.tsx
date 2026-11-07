@@ -16,6 +16,7 @@ import { Toggle } from '@/components/ui/Toggle';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 import { DOCUMENT_CATALOG } from '@/data/documents';
 import { findScholarship } from '@/lib/catalog';
+import { safeExternalUrl } from '@/lib/externalUrl';
 import { formatAmount } from '@/lib/format';
 import { formatDate } from '@/lib/dates';
 import { evaluateScholarship, scoreTone } from '@/lib/match';
@@ -47,6 +48,7 @@ const FAQ_ITEMS: AccordionItem[] = [
 export const ScholarshipDetailPage = () => {
   const { id = '' } = useParams();
   const scholarship = findScholarship(id);
+  const officialUrl = scholarship ? safeExternalUrl(scholarship.officialUrl) : null;
   const profile = useProfileStore((state) => state.profile);
   const tracked = useTrackerStore((state) => (scholarship ? state.applications[scholarship.id] : undefined));
   const placeApplication = useTrackerStore((state) => state.placeApplication);
@@ -155,7 +157,7 @@ export const ScholarshipDetailPage = () => {
             <h2 className="font-heading text-xl font-semibold text-fg">Your eligibility</h2>
             {match ? (
               <>
-                <p className="rounded-xl bg-raised px-4 py-3 text-sm font-semibold text-ink">
+                <p className="rounded-xl bg-raised px-4 py-3 text-sm font-semibold text-fg">
                   You meet {match.criteria.filter((criterion) => criterion.status === 'met').length} of {match.criteria.length} criteria
                   {match.criteria.some((criterion) => criterion.status === 'near') && (
                     <>; {match.criteria.filter((criterion) => criterion.status === 'near').length} nearly met</>
@@ -233,16 +235,18 @@ export const ScholarshipDetailPage = () => {
 
           <Card className="space-y-3 p-6">
             <p className="text-sm text-muted">Always confirm details on the official website before you apply.</p>
-            <a
-              href={scholarship.officialUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={buttonClass('secondary', 'md', 'w-full')}
-            >
-              Visit official website
-              <ArrowUpRight size={18} aria-hidden="true" />
-              <span className="sr-only">(opens in a new tab)</span>
-            </a>
+            {officialUrl && (
+              <a
+                href={officialUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={buttonClass('secondary', 'md', 'w-full')}
+              >
+                Visit official website
+                <ArrowUpRight size={18} aria-hidden="true" />
+                <span className="sr-only">(opens in a new tab)</span>
+              </a>
+            )}
           </Card>
         </aside>
       </div>

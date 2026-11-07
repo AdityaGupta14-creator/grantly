@@ -17,21 +17,7 @@
     <meta name="twitter:title" content="Grantly | Find it. Match it. Win it." />
     <meta name="twitter:description" content="Discover scholarships, understand your match, and track every deadline and document." />
     <meta name="twitter:image" content="/og-image.svg" />
-    <script>
-      (function () {
-        var stored = localStorage.getItem('grantly-preferences');
-        var theme = null;
-        try {
-          theme = stored ? JSON.parse(stored).state.theme : null;
-        } catch (e) {
-          theme = null;
-        }
-        var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        if (theme === 'dark' || ((!theme || theme === 'system') && prefersDark)) {
-          document.documentElement.classList.add('dark');
-        }
-      })();
-    </script>
+    <script src="/theme-init.js"></script>
     <title>Grantly | Find it. Match it. Win it.</title>
   </head>
   <body>

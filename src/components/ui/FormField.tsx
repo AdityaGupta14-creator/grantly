@@ -21,7 +21,7 @@ const FieldWrapper = ({ id, label, error, hint, children }: FieldWrapperProps) =
       </p>
     )}
     {error && (
-      <p id={`${id}-error`} role="alert" className="text-sm font-medium text-danger-700">
+      <p id={`${id}-error`} role="alert" className="text-sm font-medium text-danger-700 dark:text-danger-300">
         {error}
       </p>
     )}

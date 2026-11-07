@@ -1,9 +1,11 @@
+import { lazy, Suspense } from 'react';
 import { Link } from 'react-router-dom';
 import { BrandMark } from '@/components/layout/BrandMark';
-import { NotificationBell } from '@/components/layout/NotificationBell';
 import { ThemeToggle } from '@/components/layout/ThemeToggle';
 import { APP_NAME, ROUTES } from '@/lib/routes';
 import { useProfileStore } from '@/store/profileStore';
+
+const NotificationBell = lazy(() => import('@/components/layout/NotificationBell').then((module) => ({ default: module.NotificationBell })));
 
 export const Header = ({ showNotifications }: { showNotifications: boolean }) => {
   const hasProfile = useProfileStore((state) => state.profile !== null);
@@ -15,7 +17,7 @@ export const Header = ({ showNotifications }: { showNotifications: boolean }) =>
           <span className="font-heading text-xl font-bold tracking-tight text-fg">{APP_NAME}</span>
         </Link>
         <div className="flex items-center gap-2">
-          {showNotifications && hasProfile && <NotificationBell />}
+          {showNotifications && hasProfile && <Suspense fallback={null}><NotificationBell /></Suspense>}
           <ThemeToggle />
         </div>
       </div>

@@ -12,4 +12,5 @@ export const ROUTES = {
   profile: '/profile',
 } as const;
 
+/** Build a client route to a scholarship detail record. */
 export const scholarshipPath = (id: string): string => `/scholarship/${id}`;
